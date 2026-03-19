@@ -1,26 +1,49 @@
-import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { Repository, FindOptionsWhere, DeepPartial } from 'typeorm';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { User } from './entities/user.entity';
 
 @Injectable()
 export class UsersService {
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  constructor(
+    @InjectRepository(User)
+    private readonly usersRepository: Repository<User>,
+  ) {}
+
+  async create(newUser: DeepPartial<User>) {
+    return this.usersRepository.save(newUser);
   }
 
-  findAll() {
-    return `This action returns all users`;
+  async findAll() {
+    return this.usersRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(query: FindOptionsWhere<User>) {
+    const user = await this.usersRepository.findOne({ where: query });
+
+    if (!user) {
+      throw new NotFoundException('Пользователь не найден');
+    }
+
+    return user;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  update(query: FindOptionsWhere<User>, dto: UpdateUserDto) {
+    return this.usersRepository.update(query, dto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(query: FindOptionsWhere<User>) {
+    const user = await this.findOne(query);
+
+    await this.usersRepository.delete(query);
+
+    return user;
+  }
+
+  async findByEmailOrUsername(email: string, username: string) {
+    return this.usersRepository.findOne({
+      where: [{ email: email }, { username: username }],
+    });
   }
 }

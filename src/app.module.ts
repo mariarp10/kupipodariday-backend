@@ -5,6 +5,11 @@ import { UsersModule } from './users/users.module';
 import { WishesModule } from './wishes/wishes.module';
 import { WishlistModule } from './wishlist/wishlist.module';
 import { OffersModule } from './offers/offers.module';
+import { User } from './users/entities/user.entity';
+import { Offer } from './offers/entities/offer.entity';
+import { Wish } from './wishes/entities/wish.entity';
+import { Wishlist } from './wishlist/entities/wishlist.entity';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -14,14 +19,15 @@ import { OffersModule } from './offers/offers.module';
       port: 5432,
       username: 'student',
       password: 'student',
-      database: 'kupipodaridai',
-      entities: [],
+      database: 'kupipodariday',
+      entities: [User, Offer, Wish, Wishlist],
       synchronize: true,
     }),
     UsersModule,
     WishesModule,
     WishlistModule,
     OffersModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [],
