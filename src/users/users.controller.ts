@@ -6,9 +6,13 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { JwtGuard } from 'src/auth/guards/jwt.guard';
+import { TAuthedUser } from 'src/auth/authedUser.type';
 
 @Controller('users')
 export class UsersController {
@@ -17,6 +21,12 @@ export class UsersController {
   @Get()
   findAll() {
     return this.usersService.findAll();
+  }
+
+  @Get('me')
+  @UseGuards(JwtGuard)
+  getOwnUser(@Req() req: Request & { user: TAuthedUser }) {
+    return req.user;
   }
 
   @Get(':id')

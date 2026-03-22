@@ -1,14 +1,18 @@
 import { Injectable, ConflictException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { CreateUserDto } from '../users/dto/create-user.dto';
-import { SignInUserDto } from './dto/sign-in.dto';
 import { PasswordService } from './password.service';
+import { JwtService } from '@nestjs/jwt';
+import { TAuthedUser } from './authedUser.type';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly usersService: UsersService,
     private readonly passwordService: PasswordService,
+    private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
   ) {}
 
   async register(dto: CreateUserDto) {
@@ -32,10 +36,39 @@ export class AuthService {
       password: hashedPassword,
     };
 
-    return this.usersService.create(newUser);
+    const { password: _password, ...result } = await this.usersService.create(
+      newUser,
+    );
+
+    return result;
   }
 
-  login(dto: SignInUserDto) {
-    return 'This is a login method';
+  async validateUser(username: string, password: string) {
+    const user = await this.usersService.findOneOrNull({ username });
+
+    if (!user) {
+      return null;
+    }
+
+    const isPasswordValid = await this.passwordService.verifyPassword(
+      password,
+      user.password,
+    );
+
+    if (!isPasswordValid) {
+      return null;
+    }
+
+    const { password: _password, ...result } = user;
+
+    return result;
+  }
+
+  auth(user: TAuthedUser) {
+    const payload = { sub: user.id };
+
+    return {
+      access_token: this.jwtService.sign(payload),
+    };
   }
 }

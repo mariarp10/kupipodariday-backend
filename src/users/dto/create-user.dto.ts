@@ -6,7 +6,6 @@ export class CreateUserDto {
 
   @IsOptional()
   @IsString()
-  @Length(2, 200)
   about?: string;
 
   @IsOptional()

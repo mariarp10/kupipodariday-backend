@@ -29,7 +29,7 @@ export class UsersService {
     return user;
   }
 
-  update(query: FindOptionsWhere<User>, dto: UpdateUserDto) {
+  async update(query: FindOptionsWhere<User>, dto: UpdateUserDto) {
     return this.usersRepository.update(query, dto);
   }
 
@@ -45,5 +45,9 @@ export class UsersService {
     return this.usersRepository.findOne({
       where: [{ email: email }, { username: username }],
     });
+  }
+
+  async findOneOrNull(query: FindOptionsWhere<User>) {
+    return this.usersRepository.findOne({ where: query });
   }
 }
