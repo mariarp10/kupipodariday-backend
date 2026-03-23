@@ -29,14 +29,19 @@ export class UsersController {
     return req.user;
   }
 
-  @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.usersService.findOne({ id });
+  @Patch('me')
+  @UseGuards(JwtGuard)
+  updateUserProfile(
+    @Req() req: Request & { user: TAuthedUser },
+    @Body() dto: UpdateUserDto,
+  ) {
+    return this.usersService.updateUserProfile(req.user.id, dto);
   }
 
-  @Patch(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateUserDto) {
-    return this.usersService.update({ id }, dto);
+  @Get(':username')
+  @UseGuards(JwtGuard)
+  findOne(@Param('username') username: string) {
+    return this.usersService.findOne({ username });
   }
 
   @Delete(':id')
