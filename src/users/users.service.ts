@@ -3,11 +3,12 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Repository, FindOptionsWhere, DeepPartial } from 'typeorm';
+import { Repository, FindOptionsWhere, DeepPartial, ILike } from 'typeorm';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { PasswordService } from '../password/password.service';
+import { FindUserDto } from './dto/find-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -104,5 +105,14 @@ export class UsersService {
     }
 
     return this.update(id, dto);
+  }
+
+  async findMany(dto: FindUserDto) {
+    return this.usersRepository.find({
+      where: [
+        { username: ILike(`%${dto.query}%`) },
+        { email: ILike(`%${dto.query}%`) },
+      ],
+    });
   }
 }

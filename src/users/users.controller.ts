@@ -5,6 +5,7 @@ import {
   Patch,
   Param,
   Delete,
+  Post,
   ParseIntPipe,
   UseGuards,
   Req,
@@ -13,6 +14,7 @@ import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import { TAuthedUser } from 'src/auth/authedUser.type';
+import { FindUserDto } from './dto/find-user.dto';
 
 @Controller('users')
 export class UsersController {
@@ -36,6 +38,12 @@ export class UsersController {
     @Body() dto: UpdateUserDto,
   ) {
     return this.usersService.updateUserProfile(req.user.id, dto);
+  }
+
+  @Post('find')
+  @UseGuards(JwtGuard)
+  queryUser(@Body() dto: FindUserDto) {
+    return this.usersService.findMany(dto);
   }
 
   @Get(':username')
