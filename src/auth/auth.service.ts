@@ -31,14 +31,23 @@ export class AuthService {
       dto.password,
     );
 
-    const newUser = {
+    // если не заполнить about при регистрации, то фронт присылает пустую строку и не срабатывает дефолтное значения для поля, воркэраунд для этого кейса
+    if (dto.about === '') {
+      const { password: _password, ...result } = await this.usersService.create(
+        {
+          username: dto.username,
+          password: hashedPassword,
+          email: dto.email,
+        },
+      );
+
+      return result;
+    }
+
+    const { password: _password, ...result } = await this.usersService.create({
       ...dto,
       password: hashedPassword,
-    };
-
-    const { password: _password, ...result } = await this.usersService.create(
-      newUser,
-    );
+    });
 
     return result;
   }
