@@ -3,7 +3,13 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Repository, FindOptionsWhere, DeepPartial, ILike } from 'typeorm';
+import {
+  Repository,
+  FindOptionsWhere,
+  FindOneOptions,
+  DeepPartial,
+  ILike,
+} from 'typeorm';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
@@ -22,16 +28,12 @@ export class UsersService {
     return this.usersRepository.save(newUser);
   }
 
-  async findAll(query?: FindOptionsWhere<User>) {
-    if (!query) {
-      return this.usersRepository.find();
-    }
-
-    return this.usersRepository.find({ where: query });
+  async findAll() {
+    return this.usersRepository.find();
   }
 
-  async findOne(query: FindOptionsWhere<User>) {
-    const user = await this.usersRepository.findOne({ where: query });
+  async findOne(options: FindOneOptions<User>) {
+    const user = await this.usersRepository.findOne(options);
 
     if (!user) {
       throw new NotFoundException('Пользователь не найден');
@@ -41,28 +43,26 @@ export class UsersService {
   }
 
   async update(id: number, dto: UpdateUserDto) {
-    const user = await this.findOne({ id });
-
-    const updatedUser = { ...user, ...dto };
-
-    await this.usersRepository.save(updatedUser);
-
-    const { password: _password, ...rest } = await this.findOne({ id });
+    const user = await this.findOne({ where: { id } });
+    const { password: _password, ...rest } = await this.usersRepository.save({
+      ...user,
+      ...dto,
+    });
 
     return rest;
   }
 
-  async remove(query: FindOptionsWhere<User>) {
-    const user = await this.findOne(query);
+  async remove(id: number) {
+    const user = await this.findOne({ where: { id } });
 
-    await this.usersRepository.delete(query);
+    await this.usersRepository.delete(id);
 
     return user;
   }
 
   async findByEmailOrUsername(email: string, username: string) {
     return this.usersRepository.findOne({
-      where: [{ email: email }, { username: username }],
+      where: [{ email }, { username }],
     });
   }
 
@@ -70,8 +70,24 @@ export class UsersService {
     return this.usersRepository.findOne({ where: query });
   }
 
+  async findUserWithPassword(username: string) {
+    return this.usersRepository.findOne({
+      where: { username },
+      select: {
+        id: true,
+        username: true,
+        about: true,
+        avatar: true,
+        email: true,
+        password: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+  }
+
   async updateUserProfile(id: number, dto: UpdateUserDto) {
-    const user = await this.findOne({ id });
+    const user = await this.findOne({ where: { id } });
 
     if (dto.username && dto.username !== user.username) {
       const duplicateExist = !!(await this.findOneOrNull({
@@ -114,5 +130,23 @@ export class UsersService {
         { email: ILike(`%${dto.query}%`) },
       ],
     });
+  }
+
+  async getOwnWishes(id: number) {
+    const user = await this.findOne({
+      where: { id },
+      relations: ['wishes'],
+    });
+
+    return user.wishes;
+  }
+
+  async getAnotherUserWishes(username: string) {
+    const user = await this.findOne({
+      where: { username },
+      relations: ['wishes'],
+    });
+
+    return user.wishes;
   }
 }

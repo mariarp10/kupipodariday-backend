@@ -40,6 +40,12 @@ export class UsersController {
     return this.usersService.updateUserProfile(req.user.id, dto);
   }
 
+  @Get('me/wishes')
+  @UseGuards(JwtGuard)
+  getOwnWishes(@Req() req: Request & { user: TAuthedUser }) {
+    return this.usersService.getOwnWishes(req.user.id);
+  }
+
   @Post('find')
   @UseGuards(JwtGuard)
   queryUser(@Body() dto: FindUserDto) {
@@ -49,11 +55,17 @@ export class UsersController {
   @Get(':username')
   @UseGuards(JwtGuard)
   findOne(@Param('username') username: string) {
-    return this.usersService.findOne({ username });
+    return this.usersService.findOne({ where: { username } });
+  }
+
+  @Get(':username/wishes')
+  @UseGuards(JwtGuard)
+  getAnotherUserWishes(@Param('username') username: string) {
+    return this.usersService.getAnotherUserWishes(username);
   }
 
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number) {
-    return this.usersService.remove({ id });
+    return this.usersService.remove(id);
   }
 }
