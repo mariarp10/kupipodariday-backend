@@ -6,10 +6,12 @@ import {
   UpdateDateColumn,
   ManyToOne,
   OneToMany,
+  Unique,
 } from 'typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { Offer } from 'src/offers/entities/offer.entity';
 
+@Unique(['owner', 'link'])
 @Entity()
 export class Wish {
   @PrimaryGeneratedColumn()

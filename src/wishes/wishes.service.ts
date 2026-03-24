@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { CreateWishDto } from './dto/create-wish.dto';
 import { UpdateWishDto } from './dto/update-wish.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Wish } from './entities/wish.entity';
 import { Repository, FindOptionsWhere } from 'typeorm';
+import { TAuthedUser } from '../auth/authedUser.type';
 
 @Injectable()
 export class WishesService {
@@ -11,8 +12,22 @@ export class WishesService {
     @InjectRepository(Wish) private readonly wishesRepository: Repository<Wish>,
   ) {}
 
-  create(dto: CreateWishDto) {
-    return this.wishesRepository.save(dto);
+  async create(user: TAuthedUser, dto: CreateWishDto) {
+    const wish = {
+      ...dto,
+      owner: user,
+    };
+
+    const exsisting = await this.findOne({
+      link: dto.link,
+      owner: { id: user.id },
+    });
+
+    if (exsisting) {
+      throw new ConflictException('Такой wish уже существует');
+    }
+
+    return this.wishesRepository.save(wish);
   }
 
   findAll() {

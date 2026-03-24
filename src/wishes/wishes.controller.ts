@@ -7,18 +7,26 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { WishesService } from './wishes.service';
 import { CreateWishDto } from './dto/create-wish.dto';
 import { UpdateWishDto } from './dto/update-wish.dto';
+import { JwtGuard } from '../auth/guards/jwt.guard';
+import { TAuthedUser } from '../auth/authedUser.type';
 
 @Controller('wishes')
 export class WishesController {
   constructor(private readonly wishesService: WishesService) {}
 
   @Post()
-  create(@Body() dto: CreateWishDto) {
-    return this.wishesService.create(dto);
+  @UseGuards(JwtGuard)
+  create(
+    @Req() req: Request & { user: TAuthedUser },
+    @Body() dto: CreateWishDto,
+  ) {
+    return this.wishesService.create(req.user, dto);
   }
 
   @Get()
