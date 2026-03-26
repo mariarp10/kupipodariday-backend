@@ -8,7 +8,7 @@ import { CreateWishDto } from './dto/create-wish.dto';
 import { UpdateWishDto } from './dto/update-wish.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Wish } from './entities/wish.entity';
-import { Repository, FindOneOptions } from 'typeorm';
+import { Repository, FindOneOptions, In } from 'typeorm';
 import { TAuthedUser } from '../auth/authedUser.type';
 
 @Injectable()
@@ -133,5 +133,15 @@ export class WishesService {
     await this.wishesRepository.increment({ id: originalWish.id }, 'copied', 1);
 
     return result;
+  }
+
+  async findByIds(ids: number[]) {
+    if (!ids.length) {
+      return [];
+    }
+
+    return this.wishesRepository.find({
+      where: { id: In(ids) },
+    });
   }
 }
