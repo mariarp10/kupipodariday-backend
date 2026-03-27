@@ -46,7 +46,7 @@ export class WishesController {
 
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.wishesService.findOne({ where: { id }, relations: ['owner'] });
+    return this.wishesService.findWishById(id);
   }
 
   @Patch(':id')

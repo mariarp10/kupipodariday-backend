@@ -35,7 +35,7 @@ export class WishesService {
   }
 
   async findAll() {
-    return this.wishesRepository.find();
+    return this.wishesRepository.find({ relations: ['owner'] });
   }
 
   async findOne(options: FindOneOptions<Wish>) {
@@ -143,5 +143,34 @@ export class WishesService {
     return this.wishesRepository.find({
       where: { id: In(ids) },
     });
+  }
+
+  async incrementRaised(id: number, amount: number) {
+    return this.wishesRepository.increment({ id }, 'raised', amount);
+  }
+
+  async findWishById(id: number) {
+    const wish = await this.findOne({
+      where: { id },
+      relations: ['owner', 'offers', 'offers.user'],
+    });
+
+    return {
+      ...wish,
+      offers: wish.offers.map((offer) => {
+        if (offer.hidden) {
+          return {
+            name: 'Скрытый участник',
+            amount: offer.amount,
+            createdAt: offer.createdAt.toLocaleString('ru-RU'),
+          };
+        }
+        return {
+          name: offer.user.username,
+          amount: offer.amount,
+          createdAt: offer.createdAt.toLocaleString('ru-RU'),
+        };
+      }),
+    };
   }
 }
