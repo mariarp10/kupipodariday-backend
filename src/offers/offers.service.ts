@@ -7,7 +7,7 @@ import { CreateOfferDto } from './dto/create-offer.dto';
 import { Repository, FindOneOptions } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Offer } from './entities/offer.entity';
-import { TAuthedUser } from '../auth/authedUser.type';
+import { TAuthedUser } from '../auth/types';
 import { WishesService } from '../wishes/wishes.service';
 import { Wish } from '../wishes/entities/wish.entity';
 
@@ -89,6 +89,7 @@ export class OffersService {
         item: wish,
         user,
         amount: dto.amount,
+        hidden: dto.hidden ?? false,
       });
 
       const createdOffer = await offersRepository.save(offer);

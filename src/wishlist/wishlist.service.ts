@@ -7,7 +7,7 @@ import { CreateWishlistDto } from './dto/create-wishlist.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, FindOneOptions } from 'typeorm';
 import { Wishlist } from './entities/wishlist.entity';
-import { TAuthedUser } from '../auth/authedUser.type';
+import { TAuthedUser } from '../auth/types';
 import { WishesService } from '../wishes/wishes.service';
 import { UpdateWishlistDto } from './dto/update-wishlist.dto';
 

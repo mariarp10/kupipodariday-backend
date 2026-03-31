@@ -9,7 +9,7 @@ import { UpdateWishDto } from './dto/update-wish.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Wish } from './entities/wish.entity';
 import { Repository, FindOneOptions, In } from 'typeorm';
-import { TAuthedUser } from '../auth/authedUser.type';
+import { TAuthedUser } from '../auth/types';
 
 @Injectable()
 export class WishesService {

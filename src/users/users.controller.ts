@@ -9,11 +9,12 @@ import {
   ParseIntPipe,
   UseGuards,
   Req,
+  HttpCode,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { JwtGuard } from 'src/auth/guards/jwt.guard';
-import { TAuthedUser } from 'src/auth/authedUser.type';
+import { JwtGuard } from '../auth/guards/jwt.guard';
+import { TAuthedRequest } from '../auth/types';
 import { FindUserDto } from './dto/find-user.dto';
 
 @Controller('users')
@@ -27,27 +28,25 @@ export class UsersController {
 
   @Get('me')
   @UseGuards(JwtGuard)
-  getOwnUser(@Req() req: Request & { user: TAuthedUser }) {
+  getOwnUser(@Req() req: TAuthedRequest) {
     return req.user;
   }
 
   @Patch('me')
   @UseGuards(JwtGuard)
-  updateUserProfile(
-    @Req() req: Request & { user: TAuthedUser },
-    @Body() dto: UpdateUserDto,
-  ) {
+  updateUserProfile(@Req() req: TAuthedRequest, @Body() dto: UpdateUserDto) {
     return this.usersService.updateUserProfile(req.user.id, dto);
   }
 
   @Get('me/wishes')
   @UseGuards(JwtGuard)
-  getOwnWishes(@Req() req: Request & { user: TAuthedUser }) {
+  getOwnWishes(@Req() req: TAuthedRequest) {
     return this.usersService.getOwnWishes(req.user.id);
   }
 
   @Post('find')
   @UseGuards(JwtGuard)
+  @HttpCode(200)
   queryUser(@Body() dto: FindUserDto) {
     return this.usersService.findMany(dto);
   }

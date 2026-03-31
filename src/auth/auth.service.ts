@@ -3,7 +3,7 @@ import { UsersService } from '../users/users.service';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { PasswordService } from '../password/password.service';
 import { JwtService } from '@nestjs/jwt';
-import { TAuthedUser } from './authedUser.type';
+import { TAuthedUser } from './types';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()

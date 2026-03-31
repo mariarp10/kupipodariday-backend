@@ -1,6 +1,7 @@
-import { IsNumber, IsOptional, IsBoolean } from 'class-validator';
+import { IsNumber, IsOptional, IsBoolean, Min } from 'class-validator';
 export class CreateOfferDto {
   @IsNumber({ maxDecimalPlaces: 2 })
+  @Min(1)
   amount: number;
 
   @IsOptional()

@@ -13,7 +13,7 @@ import {
 import { WishlistService } from './wishlist.service';
 import { CreateWishlistDto } from './dto/create-wishlist.dto';
 import { JwtGuard } from '../auth/guards/jwt.guard';
-import { TAuthedUser } from 'src/auth/authedUser.type';
+import { TAuthedRequest } from '../auth/types';
 import { UpdateWishlistDto } from './dto/update-wishlist.dto';
 
 @Controller('wishlistlists')
@@ -22,10 +22,7 @@ export class WishlistController {
   constructor(private readonly wishlistService: WishlistService) {}
 
   @Post()
-  create(
-    @Req() req: Request & { user: TAuthedUser },
-    @Body() dto: CreateWishlistDto,
-  ) {
+  create(@Req() req: TAuthedRequest, @Body() dto: CreateWishlistDto) {
     return this.wishlistService.create(req.user, dto);
   }
 
@@ -43,16 +40,13 @@ export class WishlistController {
   }
 
   @Delete(':id')
-  remove(
-    @Req() req: Request & { user: TAuthedUser },
-    @Param('id', ParseIntPipe) id: number,
-  ) {
+  remove(@Req() req: TAuthedRequest, @Param('id', ParseIntPipe) id: number) {
     return this.wishlistService.deleteCollection(req.user, id);
   }
 
   @Patch(':id')
   updateCollection(
-    @Req() req: Request & { user: TAuthedUser },
+    @Req() req: TAuthedRequest,
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateWishlistDto,
   ) {

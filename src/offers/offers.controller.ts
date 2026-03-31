@@ -5,14 +5,13 @@ import {
   Body,
   Param,
   Req,
-  Request,
   ParseIntPipe,
 } from '@nestjs/common';
 import { OffersService } from './offers.service';
 import { CreateOfferDto } from './dto/create-offer.dto';
 import { UseGuards } from '@nestjs/common';
 import { JwtGuard } from '../auth/guards/jwt.guard';
-import { TAuthedUser } from '../auth/authedUser.type';
+import { TAuthedRequest } from '../auth/types';
 
 @Controller('offers')
 @UseGuards(JwtGuard)
@@ -20,10 +19,7 @@ export class OffersController {
   constructor(private readonly offersService: OffersService) {}
 
   @Post()
-  create(
-    @Req() req: Request & { user: TAuthedUser },
-    @Body() createOfferDto: CreateOfferDto,
-  ) {
+  create(@Req() req: TAuthedRequest, @Body() createOfferDto: CreateOfferDto) {
     return this.offersService.addOffer(req.user, createOfferDto);
   }
 
